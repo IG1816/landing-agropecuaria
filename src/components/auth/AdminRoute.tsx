@@ -1,0 +1,27 @@
+import { Navigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+import { useIsAdmin } from '../../hooks/useIsAdmin';
+import type { ReactNode } from 'react';
+
+export default function AdminRoute({ children }: { children: ReactNode }) {
+  const { user, loading: authLoading } = useAuth();
+  const { isAdmin, loading: adminLoading } = useIsAdmin();
+
+  if (authLoading || adminLoading) {
+    return (
+      <div className="min-h-screen bg-[#0a0f0a] flex items-center justify-center">
+        <div className="w-10 h-10 border-2 border-emerald-500/30 border-t-emerald-400 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" state={{ from: '/admin' }} replace />;
+  }
+
+  if (!isAdmin) {
+    return <Navigate to="/configurar" replace />;
+  }
+
+  return <>{children}</>;
+}
